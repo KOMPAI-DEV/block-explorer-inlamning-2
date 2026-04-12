@@ -8,8 +8,13 @@ jest.mock('ethers', () => {
         JsonRpcProvider: jest.fn().mockImplementation(() => {
             return {
                 getBlockNumber: jest.fn().mockResolvedValue(42),
-                // Vi mockar att saldot är 1.5 Ether (uttryckt i Wei)
-                getBalance: jest.fn().mockResolvedValue(1500000000000000000n) 
+                getBalance: jest.fn().mockResolvedValue(1500000000000000000n),
+                getSigner: jest.fn().mockResolvedValue({
+                    // Mockar transaktionssvaret från ethers.js
+                    sendTransaction: jest.fn().mockResolvedValue({
+                        hash: '0xfakeTransactionHash123456789'
+                    })
+                })
             };
         })
     };
@@ -38,5 +43,15 @@ describe('BlockchainService', () => {
         const balance = await blockchainService.getBalance(dummyAddress);
         expect(typeof balance).toBe('string');
         expect(balance).toBe('1.5'); // Vi förväntar oss 1.5 ETH baserat på vår mock
+    });
+
+    test('should send a transaction and return the transaction hash', async () => {
+        const toAddress = '0x9876543210987654321098765432109876543210';
+        const amount = '0.5'; // 0.5 ETH
+        
+        const txHash = await blockchainService.sendTransaction(toAddress, amount);
+        
+        expect(typeof txHash).toBe('string');
+        expect(txHash).toBe('0xfakeTransactionHash123456789');
     });
 });

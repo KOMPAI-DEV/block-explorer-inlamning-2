@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block Explorer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1">Ethereum Block Explorer</span>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Aktuellt Block</h5>
+                        <p class="card-text display-6 text-primary" id="block-number-display">Laddar...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Konto & Saldo</h5>
+                        <div class="mb-3">
+                            <label for="address-input" class="form-label">Ange Ethereum-adress:</label>
+                            <div class="input-group">
+                                <input type="text" id="address-input" class="form-control" placeholder="0x...">
+                                <button class="btn btn-outline-secondary" id="check-balance-btn" type="button">Sök</button>
+                            </div>
+                        </div>
+                        <p class="card-text fw-bold">Saldo: <span id="balance-display" class="text-success">- ETH</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 text-center mt-4">
+                <button id="open-tx-modal-btn" class="btn btn-primary btn-lg">Skapa ny transaktion</button>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Senaste transaktioner</h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Hash</th>
+                                        <th>Från</th>
+                                        <th>Till</th>
+                                        <th>Värde (ETH)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tx-list-root">
+                                    <tr><td colspan="4" class="text-center text-muted">Laddar transaktioner...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="modal-root"></div>
+
+    <script type="module" src="./dist/index.js"></script>
+</body>
+</html>

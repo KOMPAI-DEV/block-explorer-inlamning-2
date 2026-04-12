@@ -1,4 +1,4 @@
-import { JsonRpcProvider, formatEther } from 'ethers';
+import { JsonRpcProvider, formatEther, parseEther, TransactionResponse } from 'ethers';
 
 export class BlockchainService {
     private provider: JsonRpcProvider;
@@ -25,6 +25,36 @@ export class BlockchainService {
         } catch (error) {
             console.error("Misslyckades med att hämta saldo:", error);
             throw new Error("Kunde inte hämta saldo för adressen.");
+        }
+    }
+
+    async sendTransaction(toAddress: string, amountEther: string): Promise<string> {
+        try {
+            // Hämtar det första testkontot från vår lokala nod (Anvil)
+            const signer = await this.provider.getSigner();
+            
+            // Bygger och skickar transaktionen
+            const tx = await signer.sendTransaction({
+                to: toAddress,
+                value: parseEther(amountEther) // Konverterar "0.5" ETH till Wei
+            });
+            
+            // Returnerar kvittot (hashen) på att transaktionen ligger i blockkedjan
+            return tx.hash;
+        } catch (error) {
+            console.error("Misslyckades med att skicka transaktion:", error);
+            throw new Error("Kunde inte genomföra transaktionen.");
+        }
+    }
+
+    async getLatestTransactions(): Promise<TransactionResponse[]> {
+        try {
+            const block = await this.provider.getBlock('latest', true);
+            if (!block) return [];
+            return block.prefetchedTransactions;
+        } catch (error) {
+            console.error("Misslyckades med att hämta transaktioner:", error);
+            throw new Error("Kunde inte hämta transaktioner från senaste blocket.");
         }
     }
 }
