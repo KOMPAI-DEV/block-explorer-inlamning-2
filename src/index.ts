@@ -80,4 +80,4 @@ class App {
 
 // Starta applikationen när DOM:en är redo
 const app = new App();
-app.init();
+app.init().catch(err => console.error("Applikationen kunde inte starta:", err));

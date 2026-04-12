@@ -14,6 +14,12 @@ jest.mock('ethers', () => {
                     sendTransaction: jest.fn().mockResolvedValue({
                         hash: '0xfakeTransactionHash123456789'
                     })
+                }),
+                getBlock: jest.fn().mockResolvedValue({
+                    prefetchedTransactions: [
+                        { hash: '0xabc', from: '0x111', to: '0x222', value: 500000000000000000n },
+                        { hash: '0xdef', from: '0x333', to: '0x444', value: 0n } // Ska filtreras bort i View
+                    ]
                 })
             };
         })
@@ -53,5 +59,14 @@ describe('BlockchainService', () => {
         
         expect(typeof txHash).toBe('string');
         expect(txHash).toBe('0xfakeTransactionHash123456789');
+    });
+
+    test('should return an array of transactions from the latest block', async () => {
+        const transactions = await blockchainService.getLatestTransactions();
+        
+        expect(Array.isArray(transactions)).toBe(true);
+        expect(transactions).toHaveLength(2);
+        expect(transactions[0].hash).toBe('0xabc');
+        expect(transactions[0].value).toBe(500000000000000000n);
     });
 });
