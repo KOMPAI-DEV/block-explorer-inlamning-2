@@ -1,16 +1,20 @@
 export class TransactionModal {
     private rootElement: HTMLElement | null;
-    private onSubmitCallback: (to: string, amount: string) => Promise<void>;
+    private onSubmitCallback?: (to: string, amount: string) => Promise<void>;
+    private modalElement: HTMLElement | null = null;
+    private statusElement: HTMLElement | null = null;
 
-    constructor(onSubmit: (to: string, amount: string) => Promise<void>) {
+    constructor() {
         this.rootElement = document.getElementById('modal-root');
-        this.onSubmitCallback = onSubmit;
+    }
+
+    onSubmit(callback: (to: string, amount: string) => Promise<void>): void {
+        this.onSubmitCallback = callback;
     }
 
     render() {
         if (!this.rootElement) return;
 
-        // Vi injicerar HTML för modalen dynamiskt (Presentationskomponent)
         this.rootElement.innerHTML = `
             <div class="modal fade" id="txModal" tabindex="-1">
                 <div class="modal-dialog">
@@ -46,26 +50,31 @@ export class TransactionModal {
         const sendBtn = document.getElementById('tx-send-btn');
         const closeBtn = document.getElementById('close-modal-btn');
         const closeIcon = document.getElementById('close-modal-icon');
-        const statusDiv = document.getElementById('tx-status');
         const toInput = document.getElementById('tx-to-address') as HTMLInputElement;
         const amountInput = document.getElementById('tx-amount') as HTMLInputElement;
 
-        // Stäng-knappar
+        this.modalElement = document.getElementById('txModal');
+        this.statusElement = document.getElementById('tx-status');
+
         closeBtn?.addEventListener('click', () => this.hide());
         closeIcon?.addEventListener('click', () => this.hide());
 
-        // Skicka-knappen
         if (sendBtn) {
             sendBtn.addEventListener('click', async () => {
-                if (statusDiv) statusDiv.innerHTML = '<span class="text-info">Skickar transaktion...</span>';
+                if (!toInput.value || !amountInput.value) {
+                    if (this.statusElement) this.statusElement.innerHTML = '<span class="text-danger">Fyll i alla fält.</span>';
+                    return;
+                }
+
+                if (this.statusElement) this.statusElement.innerHTML = '<span class="text-info">Skickar transaktion...</span>';
                 sendBtn.setAttribute('disabled', 'true');
 
                 try {
-                    await this.onSubmitCallback(toInput.value, amountInput.value);
-                    if (statusDiv) statusDiv.innerHTML = '<span class="text-success">Transaktion lyckades!</span>';
-                    setTimeout(() => this.hide(), 2000); // Stäng efter 2 sekunder vid success
+                    if (this.onSubmitCallback) await this.onSubmitCallback(toInput.value, amountInput.value);
+                    if (this.statusElement) this.statusElement.innerHTML = '<span class="text-success">Transaktion lyckades!</span>';
+                    setTimeout(() => this.hide(), 2000);
                 } catch (error) {
-                    if (statusDiv) statusDiv.innerHTML = '<span class="text-danger">Misslyckades. Kontrollera adressen.</span>';
+                    if (this.statusElement) this.statusElement.innerHTML = '<span class="text-danger">Misslyckades. Kontrollera adressen.</span>';
                 } finally {
                     sendBtn.removeAttribute('disabled');
                 }
@@ -74,20 +83,17 @@ export class TransactionModal {
     }
 
     show() {
-        const modalEl = document.getElementById('txModal');
-        if (modalEl) {
-            modalEl.classList.add('show', 'd-block');
-            modalEl.style.backgroundColor = 'rgba(0,0,0,0.5)'; // Mörk bakgrund
+        if (this.modalElement) {
+            this.modalElement.classList.add('show', 'd-block');
+            this.modalElement.style.backgroundColor = 'rgba(0,0,0,0.5)';
         }
     }
 
     hide() {
-        const modalEl = document.getElementById('txModal');
-        const statusDiv = document.getElementById('tx-status');
-        if (modalEl) {
-            modalEl.classList.remove('show', 'd-block');
-            modalEl.style.backgroundColor = '';
+        if (this.modalElement) {
+            this.modalElement.classList.remove('show', 'd-block');
+            this.modalElement.style.backgroundColor = '';
         }
-        if (statusDiv) statusDiv.innerHTML = ''; // Återställ status
+        if (this.statusElement) this.statusElement.innerHTML = '';
     }
 }

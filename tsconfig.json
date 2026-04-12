@@ -9,8 +9,7 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
-    "lib": ["DOM", "ES2020"],
-    "types": ["jest"]
+    "lib": ["DOM", "ES2020"]
   },
   "include": ["src/**/*"]
 }

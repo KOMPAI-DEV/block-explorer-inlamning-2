@@ -1,13 +1,17 @@
 {
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "build": "tsc"
+    "build": "webpack",
+    "start": "npx serve .",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "jest": "^30.3.0",
     "ts-jest": "^29.4.9",
-    "typescript": "^6.0.2"
+    "ts-loader": "^9.5.7",
+    "typescript": "^6.0.2",
+    "webpack": "^5.106.1",
+    "webpack-cli": "^7.0.2"
   },
   "dependencies": {
     "ethers": "^6.16.0"

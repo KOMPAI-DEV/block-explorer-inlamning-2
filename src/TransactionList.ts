@@ -1,4 +1,4 @@
-import { TransactionResponse, formatEther } from 'ethers';
+import { FormattedTransaction } from './types';
 
 export class TransactionList {
     private tbodyElement: HTMLElement | null;
@@ -7,13 +7,12 @@ export class TransactionList {
         this.tbodyElement = document.getElementById('tx-list-root');
     }
 
-    render(transactions: TransactionResponse[]) {
+    render(transactions: FormattedTransaction[]) {
         if (!this.tbodyElement) return;
 
-        // Filtrerar bort transaktioner med värdet 0 (t.ex. kontraktsanrop utan ETH)
         const withValue = transactions
-            .filter(tx => tx.value > 0n)
-            .slice(0, 10); // Max 10 rader för att inte frysa gränssnittet
+            .filter(tx => Number(tx.value) > 0)
+            .slice(0, 10);
 
         if (withValue.length === 0) {
             this.tbodyElement.innerHTML = `
@@ -22,7 +21,6 @@ export class TransactionList {
             return;
         }
 
-        // Mappar varje transaktion till en HTML-rad
         this.tbodyElement.innerHTML = withValue
             .map(tx => `
                 <tr>
@@ -35,9 +33,14 @@ export class TransactionList {
                     <td class="text-truncate" style="max-width:130px;" title="${tx.to ?? ''}">
                         <code>${tx.to ? tx.to.slice(0, 8) + '…' : '-'}</code>
                     </td>
-                    <td>${formatEther(tx.value)} ETH</td>
+                    <td>${tx.value} ETH</td>
                 </tr>
             `)
             .join('');
+    }
+
+    renderError(message: string): void {
+        if (!this.tbodyElement) return;
+        this.tbodyElement.innerHTML = `<tr><td colspan="4" class="text-center text-danger">${message}</td></tr>`;
     }
 }
